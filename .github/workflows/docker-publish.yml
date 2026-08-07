@@ -8,6 +8,8 @@ on:
 env:
   BACKEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/ai-doc-analyzer-backend
   FRONTEND_IMAGE: ${{ secrets.DOCKER_USERNAME }}/ai-doc-analyzer-frontend
+  BACKEND_RENDER_HOOK_URL: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}
+  FRONTEND_RENDER_HOOK_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}
 
 jobs:
   build-and-deploy:
@@ -53,9 +55,9 @@ jobs:
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8000' }}
 
       - name: Trigger Render backend deploy
-        if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL != '' }}
-        run: curl -fsS -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}"
+        if: ${{ env.BACKEND_RENDER_HOOK_URL != '' }}
+        run: curl -fsS -X POST "${{ env.BACKEND_RENDER_HOOK_URL }}"
 
       - name: Trigger Render frontend deploy
-        if: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL != '' }}
-        run: curl -fsS -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}"
+        if: ${{ env.FRONTEND_RENDER_HOOK_URL != '' }}
+        run: curl -fsS -X POST "${{ env.FRONTEND_RENDER_HOOK_URL }}"
