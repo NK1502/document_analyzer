@@ -10,7 +10,7 @@ COPY requirements.txt .
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the backend application code
+# Copy application code
 COPY app/ ./app/
 
 # Expose the port FastAPI runs on

@@ -18,8 +18,8 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -30,10 +30,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Verify backend files
+      - name: Verify backend Dockerfile
         run: |
-          ls -la ${{ github.workspace }}/backend
-          test -f ${{ github.workspace }}/backend/Dockerfile
+          ls -la backend
+          test -f backend/Dockerfile
 
       - name: Build and push backend image
         uses: docker/build-push-action@v6
@@ -57,8 +57,8 @@ jobs:
       contents: read
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -69,10 +69,10 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Verify frontend files
+      - name: Verify frontend Dockerfile
         run: |
-          ls -la ${{ github.workspace }}/frontend
-          test -f ${{ github.workspace }}/frontend/Dockerfile
+          ls -la frontend
+          test -f frontend/Dockerfile
 
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
