@@ -30,11 +30,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Verify backend files
+        run: ls -la ${{ github.workspace }}/backend
+
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
           context: ${{ github.workspace }}/backend
-          file: ${{ github.workspace }}/backend/Dockerfile
+          file: Dockerfile
           push: true
           tags: |
             ${{ env.BACKEND_IMAGE }}:latest
@@ -64,11 +67,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Verify frontend files
+        run: ls -la ${{ github.workspace }}/frontend
+
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
         with:
           context: ${{ github.workspace }}/frontend
-          file: ${{ github.workspace }}/frontend/Dockerfile
+          file: Dockerfile
           push: true
           tags: |
             ${{ env.FRONTEND_IMAGE }}:latest
