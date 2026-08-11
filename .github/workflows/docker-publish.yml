@@ -33,8 +33,8 @@ jobs:
       - name: Build and push backend image
         uses: docker/build-push-action@v6
         with:
-          context: ./backend
-          file: Dockerfile
+          context: ${{ github.workspace }}/backend
+          file: ${{ github.workspace }}/backend/Dockerfile
           push: true
           tags: |
             ${{ env.BACKEND_IMAGE }}:latest
@@ -45,8 +45,8 @@ jobs:
       - name: Build and push frontend image
         uses: docker/build-push-action@v6
         with:
-          context: ./frontend
-          file: Dockerfile
+          context: ${{ github.workspace }}/frontend
+          file: ${{ github.workspace }}/frontend/Dockerfile
           push: true
           tags: |
             ${{ env.FRONTEND_IMAGE }}:latest
