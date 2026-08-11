@@ -15,8 +15,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Docker Hub Credentials
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          if [ -z "${{ secrets.DOCKER_USERNAME }}" ] || [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then
+          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_PASSWORD" ]; then
             echo "::error ::DOCKER_USERNAME or DOCKER_PASSWORD secret is missing! Please configure them in your GitHub Repository Settings -> Secrets and variables -> Actions."
             exit 1
           fi
@@ -54,8 +57,11 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate Docker Hub Credentials
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         run: |
-          if [ -z "${{ secrets.DOCKER_USERNAME }}" ] || [ -z "${{ secrets.DOCKER_PASSWORD }}" ]; then
+          if [ -z "$DOCKER_USERNAME" ] || [ -z "$DOCKER_PASSWORD" ]; then
             echo "::error ::DOCKER_USERNAME or DOCKER_PASSWORD secret is missing! Please configure them in your GitHub Repository Settings -> Secrets and variables -> Actions."
             exit 1
           fi
@@ -91,31 +97,37 @@ jobs:
     needs: [build-and-push-backend, build-and-push-frontend]
     runs-on: ubuntu-latest
     if: always() && (needs.build-and-push-backend.result == 'success' || needs.build-and-push-frontend.result == 'success')
+    env:
+      RENDER_BACKEND_DEPLOY_HOOK_URL: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}
+      RENDER_FRONTEND_DEPLOY_HOOK_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_BACKEND_SERVICE_ID: ${{ secrets.RENDER_BACKEND_SERVICE_ID }}
+      RENDER_FRONTEND_SERVICE_ID: ${{ secrets.RENDER_FRONTEND_SERVICE_ID }}
 
     steps:
       - name: Trigger Render Backend Deploy Hook
-        if: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL != '' }}
+        if: ${{ env.RENDER_BACKEND_DEPLOY_HOOK_URL != '' }}
         run: |
           echo "Triggering Render Backend Deployment..."
-          curl -fsS -X POST "${{ secrets.RENDER_BACKEND_DEPLOY_HOOK_URL }}"
+          curl -fsS -X POST "${RENDER_BACKEND_DEPLOY_HOOK_URL}"
 
       - name: Trigger Render Frontend Deploy Hook
-        if: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL != '' }}
+        if: ${{ env.RENDER_FRONTEND_DEPLOY_HOOK_URL != '' }}
         run: |
           echo "Triggering Render Frontend Deployment..."
-          curl -fsS -X POST "${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK_URL }}"
+          curl -fsS -X POST "${RENDER_FRONTEND_DEPLOY_HOOK_URL}"
 
       - name: Trigger Render via API (Alternative)
-        if: ${{ secrets.RENDER_API_KEY != '' && secrets.RENDER_BACKEND_SERVICE_ID != '' }}
+        if: ${{ env.RENDER_API_KEY != '' && env.RENDER_BACKEND_SERVICE_ID != '' }}
         run: |
           echo "Triggering Render Backend via API..."
-          curl -fsS -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_BACKEND_SERVICE_ID }}/deploys" \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+          curl -fsS -X POST "https://api.render.com/v1/services/${RENDER_BACKEND_SERVICE_ID}/deploys" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" \
             -H "Accept: application/json"
           
-          if [ -n "${{ secrets.RENDER_FRONTEND_SERVICE_ID }}" ]; then
+          if [ -n "${RENDER_FRONTEND_SERVICE_ID}" ]; then
             echo "Triggering Render Frontend via API..."
-            curl -fsS -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_FRONTEND_SERVICE_ID }}/deploys" \
-              -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            curl -fsS -X POST "https://api.render.com/v1/services/${RENDER_FRONTEND_SERVICE_ID}/deploys" \
+              -H "Authorization: Bearer ${RENDER_API_KEY}" \
               -H "Accept: application/json"
           fi
